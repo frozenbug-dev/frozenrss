@@ -57,7 +57,7 @@ export const createFeed = <ThrowOnError extends boolean = false>(options: Option
  * Delete feed
  */
 export const deleteFeed = <ThrowOnError extends boolean = false>(options: Options<DeleteFeedData, ThrowOnError>) =>
-  (options.client ?? client).delete<DeleteFeedResponses, unknown, ThrowOnError>({url: '/api/feeds/:id', ...options})
+  (options.client ?? client).delete<DeleteFeedResponses, unknown, ThrowOnError>({url: '/api/feeds/{id}', ...options})
 
 /**
  * List articles
@@ -69,4 +69,4 @@ export const listArticles = <ThrowOnError extends boolean = false>(options?: Opt
  * Get article
  */
 export const getArticle = <ThrowOnError extends boolean = false>(options: Options<GetArticleData, ThrowOnError>) =>
-  (options.client ?? client).get<GetArticleResponses, unknown, ThrowOnError>({url: '/api/articles/:id', ...options})
+  (options.client ?? client).get<GetArticleResponses, unknown, ThrowOnError>({url: '/api/articles/{id}', ...options})

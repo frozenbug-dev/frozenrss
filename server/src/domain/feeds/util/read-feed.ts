@@ -2,7 +2,6 @@ import {Readable} from 'stream'
 
 import FeedParser from 'feedparser'
 
-import {log} from '../../../lib/logger.ts'
 import {http} from '../../../lib/util/ky.ts'
 
 export async function readFeed(url: string) {
@@ -14,13 +13,9 @@ export async function readFeed(url: string) {
 
   if (!response.ok) throw new FeedError(`Could not fetch feed. Status code: ${response.status}`)
 
-  console.log(response.headers)
-
   const feedParser = new FeedParser({
     normalize: true,
   })
-
-  log.info(response.headers.entries())
 
   const promise = new Promise<FeedParser.Item[]>((resolve, reject) => {
     const items: FeedParser.Item[] = []

@@ -54,7 +54,7 @@ app
     })
   )
 
-  .on(['POST', 'GET'], '/api/auth/*', c => auth.handler(c.req.raw))
+  .all('/api/auth/*', c => auth.handler(c.req.raw))
   .route('/api/feeds', feedRoutes)
   .route('/api/articles', articleRoutes)
 

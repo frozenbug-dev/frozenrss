@@ -34,7 +34,7 @@ const job = defineWorkflow(
       .trim()
 
     const articleId = await step.run({name: 'persist-rss'}, async () => {
-      const storedArticle = await findArticleByUrl(input.article.link)
+      const storedArticle = await findArticleByUrl(input.article.link, input.feedId)
 
       const _updatedAt = input.article.date ?? input.article.pubdate ?? null
       const updatedAt = _updatedAt ? new Date(_updatedAt) : null

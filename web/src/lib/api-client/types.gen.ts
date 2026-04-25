@@ -18,6 +18,8 @@ export type Article = {
   url: string
   title: string
   description: string | null
+  author: string | null
+  imageUrl: string | null
   createdAt: string
   updatedAt: string | null
 }
@@ -28,9 +30,12 @@ export type ArticleWithContent = {
   url: string
   title: string
   description: string | null
+  author: string | null
+  imageUrl: string | null
   createdAt: string
   updatedAt: string | null
   content: string | null
+  wordsCount: number | null
 }
 
 export type ListFeedsData = {
@@ -83,7 +88,7 @@ export type DeleteFeedData = {
     id: string
   }
   query?: never
-  url: '/api/feeds/:id'
+  url: '/api/feeds/{id}'
 }
 
 export type DeleteFeedResponses = {
@@ -125,7 +130,7 @@ export type GetArticleData = {
     id: string
   }
   query?: never
-  url: '/api/articles/:id'
+  url: '/api/articles/{id}'
 }
 
 export type GetArticleResponses = {

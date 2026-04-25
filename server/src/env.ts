@@ -46,4 +46,6 @@ export const ENV = defineEnvironment($ => ({
   WORKERS: {
     CONCURRENCY: $('WORKERS_CONCURRENCY', z.coerce.number().default(5)),
   },
+
+  PLAYWRIGHT_WS_URL: $('PLAYWRIGHT_WS_URL', z.url().default('ws://playwright:3000')),
 }))

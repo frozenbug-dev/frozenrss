@@ -1,5 +1,6 @@
 import type {ErrorHandler} from 'hono'
 
+import {log} from '../logger.ts'
 import {ServiceError} from '../errors/service-error.js'
 
 export function withErrorHandler(): ErrorHandler {
@@ -17,7 +18,7 @@ export function withErrorHandler(): ErrorHandler {
 
     const {status, ...json} = serviceError.toJSON()
 
-    console.error(error)
+    log.error(error)
     return c.json(json, status)
   }
 }

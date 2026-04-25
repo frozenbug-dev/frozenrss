@@ -27,15 +27,19 @@ export default defineConfig({
     }),
     nitro({
       rollupConfig: {external: [/^@sentry\//]},
-      apiBaseURL: '/fns',
-      routeRules: {
+      devProxy: {
         '/api/**': {
-          proxy: 'http://localhost:4000/api/**',
+          target: 'http://localhost:4000',
+          changeOrigin: true,
         },
       },
     }),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({
+      spa: {
+        enabled: true,
+      },
+    }),
     viteReact(),
     heyApiPlugin({
       config: {

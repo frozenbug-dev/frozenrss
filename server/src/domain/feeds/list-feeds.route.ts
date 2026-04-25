@@ -46,7 +46,7 @@ export const listFeedsRoute = createHono().openapi(defs, async c => {
   return c.json(
     toSchema(Response, {
       feeds,
-      cursor: null,
+      cursor: feeds.length === query.limit ? feeds.at(-1)!.id : null,
       count,
     })
   )

@@ -1,6 +1,6 @@
 import * as z from 'zod'
 
-export function toSchema<T extends z.ZodType>(schema: T, value: z.infer<T> | any) {
+export function toSchema<T extends z.ZodType>(schema: T, value: any) {
   return schema.parse(value)
 }
 

@@ -1,8 +1,7 @@
 import {chromium} from 'playwright'
 
+import {ENV} from '../../env.ts'
 import {http} from './ky.ts'
-
-const PLAYWRIGHT_WS_URL = process.env.PLAYWRIGHT_WS_URL ?? 'ws://playwright:3000'
 
 /**
  * A small utility that tries to fetch the HTML from a page.
@@ -22,7 +21,7 @@ export async function fetchPage(url: string): Promise<string> {
   }
 
   try {
-    const browser = await chromium.connect(PLAYWRIGHT_WS_URL)
+    const browser = await chromium.connect(ENV.PLAYWRIGHT_WS_URL)
     const page = await browser.newPage()
     await page.goto(url, {waitUntil: 'networkidle'})
     const html = await page.content()

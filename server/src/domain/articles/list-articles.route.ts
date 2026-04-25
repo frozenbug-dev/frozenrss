@@ -46,7 +46,7 @@ export const listArticlesRoute = createHono().openapi(defs, async c => {
   return c.json(
     toSchema(Response, {
       articles,
-      cursor: null,
+      cursor: articles.length === query.limit ? articles.at(-1)!.id : null,
       count,
     })
   )

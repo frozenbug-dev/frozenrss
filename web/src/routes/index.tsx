@@ -1,6 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
+import {createFileRoute} from '@tanstack/react-router'
 
-export const Route = createFileRoute('/')({ component: Home })
+import {requireAuth} from '#/lib/auth-guard'
+
+export const Route = createFileRoute('/')({
+  beforeLoad: requireAuth,
+  component: Home,
+})
 
 function Home() {
   return (

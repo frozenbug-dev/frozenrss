@@ -1,4 +1,4 @@
-import {count, eq} from 'drizzle-orm'
+import {and, count, eq} from 'drizzle-orm'
 
 import {db} from '../../db/client.ts'
 import {article, type ArticleInsertRow} from '../../db/schema.ts'
@@ -10,8 +10,11 @@ export async function findArticleById(id: string) {
   return row
 }
 
-export async function findArticleByUrl(url: string) {
-  const [row] = await db.select().from(article).where(eq(article.url, url))
+export async function findArticleByUrl(url: string, feedId: string) {
+  const [row] = await db
+    .select()
+    .from(article)
+    .where(and(eq(article.url, url), eq(article.feedId, feedId)))
 
   return row
 }
@@ -24,6 +27,8 @@ export async function listArticles(filters: CursorFilters<string> = {}) {
       url: article.url,
       title: article.title,
       description: article.description,
+      author: article.author,
+      imageUrl: article.imageUrl,
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
     })
@@ -39,15 +44,7 @@ export async function listArticles(filters: CursorFilters<string> = {}) {
 }
 
 export async function createArticle(input: ArticleInsertRow) {
-  const [row] = await db.insert(article).values({
-    title: input.title,
-    url: input.url,
-    content: input.content,
-    feedId: input.feedId,
-    description: input.description,
-    createdAt: input.createdAt,
-    updatedAt: input.updatedAt,
-  }).returning()
+  const [row] = await db.insert(article).values(input).returning()
 
   return row
 }

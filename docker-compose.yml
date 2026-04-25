@@ -44,10 +44,10 @@ services:
     # cap_add:
     #   - SYS_ADMIN
     ports:
-      - "5000:5000"
-    command: npx playwright run-server --port 5000 --host 0.0.0.0
+      - "6000:6000"
+    command: npx playwright run-server --port 6000 --host 0.0.0.0
     healthcheck:
-      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:5000" ]
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:6000" ]
       interval: 10s
       timeout: 5s
       retries: 5
