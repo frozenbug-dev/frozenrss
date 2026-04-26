@@ -6,6 +6,8 @@ import {HeadContent, Link, Scripts, createRootRouteWithContext} from '@tanstack/
 import {TanStackRouterDevtoolsPanel} from '@tanstack/react-router-devtools'
 
 import {CreateFeedDialog} from '#/components/dialogs/create-feed-dialog'
+import {DeleteDialog} from '#/components/dialogs/delete-dialog'
+import {EditFeedDialog} from '#/components/dialogs/edit-feed-dialog'
 import {Button} from '#/components/ui/button'
 import {TooltipProvider} from '#/components/ui/tooltip'
 import {getLocale} from '#/paraglide/runtime'
@@ -66,6 +68,9 @@ function RootDocument({children}: {children: React.ReactNode}) {
       <body className="bg-background">
         <TooltipProvider>
           <CreateFeedDialog.Viewport />
+          <DeleteDialog.Viewport />
+          <EditFeedDialog.Viewport />
+
           {children}
         </TooltipProvider>
 

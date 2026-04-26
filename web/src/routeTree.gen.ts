@@ -14,6 +14,7 @@ import { Route as AuthRouteRouteImport } from './routes/auth/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashIndexRouteImport } from './routes/dash/index'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
+import { Route as DashFeedsRouteImport } from './routes/dash/feeds'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 
 const DashRouteRoute = DashRouteRouteImport.update({
@@ -41,6 +42,11 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const DashFeedsRoute = DashFeedsRouteImport.update({
+  id: '/feeds',
+  path: '/feeds',
+  getParentRoute: () => DashRouteRoute,
+} as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -52,12 +58,14 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteRouteWithChildren
   '/dash': typeof DashRouteRouteWithChildren
   '/auth/signup': typeof AuthSignupRoute
+  '/dash/feeds': typeof DashFeedsRoute
   '/auth/': typeof AuthIndexRoute
   '/dash/': typeof DashIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/dash/feeds': typeof DashFeedsRoute
   '/auth': typeof AuthIndexRoute
   '/dash': typeof DashIndexRoute
 }
@@ -67,20 +75,29 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteRouteWithChildren
   '/dash': typeof DashRouteRouteWithChildren
   '/auth/signup': typeof AuthSignupRoute
+  '/dash/feeds': typeof DashFeedsRoute
   '/auth/': typeof AuthIndexRoute
   '/dash/': typeof DashIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dash' | '/auth/signup' | '/auth/' | '/dash/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dash'
+    | '/auth/signup'
+    | '/dash/feeds'
+    | '/auth/'
+    | '/dash/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/signup' | '/auth' | '/dash'
+  to: '/' | '/auth/signup' | '/dash/feeds' | '/auth' | '/dash'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/dash'
     | '/auth/signup'
+    | '/dash/feeds'
     | '/auth/'
     | '/dash/'
   fileRoutesById: FileRoutesById
@@ -128,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/dash/feeds': {
+      id: '/dash/feeds'
+      path: '/feeds'
+      fullPath: '/dash/feeds'
+      preLoaderRoute: typeof DashFeedsRouteImport
+      parentRoute: typeof DashRouteRoute
+    }
     '/auth/signup': {
       id: '/auth/signup'
       path: '/signup'
@@ -153,10 +177,12 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 )
 
 interface DashRouteRouteChildren {
+  DashFeedsRoute: typeof DashFeedsRoute
   DashIndexRoute: typeof DashIndexRoute
 }
 
 const DashRouteRouteChildren: DashRouteRouteChildren = {
+  DashFeedsRoute: DashFeedsRoute,
   DashIndexRoute: DashIndexRoute,
 }
 

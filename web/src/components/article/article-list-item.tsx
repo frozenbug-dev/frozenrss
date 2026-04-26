@@ -1,7 +1,7 @@
 import type {ButtonHTMLAttributes, Ref} from 'react'
 
 import type {Article} from '#/lib/api'
-import {formatDate} from '#/lib/date-utils'
+import {formatDate, formatTimeDistance} from '#/lib/date-utils'
 import {cn} from '#/lib/utils'
 
 import {Skeleton} from '../ui/skeleton'
@@ -54,8 +54,13 @@ export function ArticlePreview({article, isActive, ref, onSelect, className, ...
           {article.author && (
             <>
               <span className="truncate">{article.author}</span>
+              <span>&middot;</span>
             </>
           )}
+
+          <time dateTime={article.updatedAt ?? article.createdAt}>
+            {formatTimeDistance(new Date(article.updatedAt ?? article.createdAt))}
+          </time>
         </div>
       </div>
       {article.imageUrl && <img src={article.imageUrl} alt="" className="size-16 shrink-0 rounded object-cover" />}

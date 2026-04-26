@@ -5,6 +5,7 @@ import z from 'zod'
 
 import {findFeedById, updateFeed} from '../domain/feeds/services.ts'
 import {log} from '../lib/logger.ts'
+import {storage} from '../lib/storage.ts'
 import {fetchPage} from '../lib/util/fetch-page.ts'
 import {ow} from '../lib/workflows.ts'
 
@@ -31,12 +32,17 @@ const job = defineWorkflow(
       const {document} = parseHTML(html)
       const result = await Defuddle(document, undefined, {markdown: false})
 
+      await storage.setItem(
+        `feed-metadata/${new URL(feed.url).hostname.replaceAll('.', '-')}.json`,
+        JSON.stringify(result, null, 2)
+      )
+
       return result
     })
 
     await step.run({name: 'update-feed'}, async () => {
       await updateFeed(feed.id, {
-        title: metadata.title || undefined,
+        title: metadata.site || undefined,
         description: metadata.description || undefined,
         iconUrl: metadata.favicon || undefined,
         language: metadata.language || undefined,

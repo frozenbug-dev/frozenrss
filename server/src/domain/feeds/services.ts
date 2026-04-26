@@ -1,7 +1,7 @@
 import {count, eq} from 'drizzle-orm'
 
 import {db} from '../../db/client.ts'
-import {feed, type FeedInsertRow} from '../../db/schema.ts'
+import {article, feed, type FeedInsertRow} from '../../db/schema.ts'
 import {withCursor, type CursorFilters} from '../../lib/util/db.ts'
 
 export async function findFeedById(id: string) {
@@ -34,9 +34,14 @@ export async function listFeeds(filters: CursorFilters<string> = {}) {
 }
 
 export async function deleteFeed(id: string) {
-  const [row] = await db.delete(feed).where(eq(feed.id, id)).returning()
+  const feedRow = await db.transaction(async tx => {
+    await tx.delete(article).where(eq(article.feedId, id))
+    const [feedRow] = await tx.delete(feed).where(eq(feed.id, id)).returning()
 
-  return row
+    return feedRow
+  })
+
+  return feedRow
 }
 
 export async function countFeeds() {
