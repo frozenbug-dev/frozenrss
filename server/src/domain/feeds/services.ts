@@ -26,7 +26,7 @@ export async function listFeeds(filters: CursorFilters<string> = {}) {
   const query = db.select().from(feed).$dynamic()
 
   return withCursor(query, {
-    column: feed.id,
+    columns: [{column: feed.id}],
     cursor: filters.cursor,
     dir: filters.dir ?? 'desc',
     limit: filters.limit ?? 50,

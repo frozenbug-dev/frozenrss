@@ -27,6 +27,12 @@ export type Article = {
   imageUrl: string | null
   createdAt: string
   updatedAt: string | null
+  feed: {
+    id: string
+    title: string | null
+    url: string
+    iconUrl: string | null
+  }
 }
 
 export type ArticleWithContent = {
@@ -39,6 +45,12 @@ export type ArticleWithContent = {
   imageUrl: string | null
   createdAt: string
   updatedAt: string | null
+  feed: {
+    id: string
+    title: string | null
+    url: string
+    iconUrl: string | null
+  }
   content: string | null
   wordsCount: number | null
 }
@@ -112,6 +124,7 @@ export type ListArticlesData = {
     limit?: number | null
     cursor?: string
     dir?: 'asc' | 'desc'
+    sort?: 'id' | 'updatedAt'
   }
   url: '/api/articles'
 }

@@ -1,29 +1,85 @@
-import {asc, desc, gt, lt, type Column, type ColumnBaseConfig, type ColumnDataType} from 'drizzle-orm'
+import {asc, desc, gt, lt, sql, type Column, type SQL, type Table} from 'drizzle-orm'
 import {type PgSelect} from 'drizzle-orm/pg-core'
+import {getTableColumns} from 'drizzle-orm/utils'
 
-export interface WithCursorOptions<
-  TConfig extends ColumnBaseConfig<ColumnDataType, string> = ColumnBaseConfig<ColumnDataType, string>,
-> {
-  column: Column<TConfig>
-  cursor?: TConfig['data']
+export function withCursor<TSelect extends PgSelect>(qb: TSelect, options: WithCursorOptions) {
+  const {columns, dir, limit} = options
+  const orderFn = dir === 'asc' ? asc : desc
+
+  let query = qb.orderBy(...columns.map(({column}) => orderFn(column as Column)))
+
+  if (options.cursor != null) {
+    const values = decodeCursor(options.cursor)
+    const cond = dir === 'asc' ? gt : lt
+
+    if (columns.length === 1) {
+      query = query.where(cond(columns[0].column as Column, values[0]))
+    } else {
+      const coalesced = columns.map(({column, default: def}) =>
+        def != null ? sql`coalesce(${column}, ${def})` : column
+      )
+      const cursorValues = columns.map(({default: def}, i) => (def != null && values[i] === 'null' ? def : values[i]))
+
+      query = query.where(
+        cond(
+          sql`(${sql.join(coalesced, sql`, `)})`,
+          sql`(${sql.join(
+            cursorValues.map(v => sql`${v}`),
+            sql`, `
+          )})`
+        )
+      )
+    }
+  }
+
+  return query.limit(limit)
+}
+
+const DEFAULT_ENCODER = (value: unknown): string =>
+  value == null ? 'null'
+    : value instanceof Date ? value.toISOString()
+    : String(value)
+
+export interface ColumnConfig {
+  column: Column | SQL
+  /** Default value for nulls (e.g., epoch for nullable timestamps). */
+  default?: unknown
+  /** Custom encoder for the cursor value. Defaults to `String()` or `'null'`. */
+  encoder?: (value: unknown) => string
+}
+
+export interface WithCursorOptions {
+  columns: [ColumnConfig, ...ColumnConfig[]]
+  cursor?: string
   dir: 'asc' | 'desc'
   limit: number
 }
 
-export function withCursor<TSelect extends PgSelect, TConfig extends ColumnBaseConfig<ColumnDataType, string>>(
-  qb: TSelect,
-  options: WithCursorOptions<TConfig>
-) {
-  const {column, cursor, dir, limit} = options
-
-  let query = qb.orderBy(dir === 'asc' ? asc(column) : desc(column))
-
-  if (cursor != null) {
-    const cond = dir === 'asc' ? gt : lt
-    query = query.where(cond(column, cursor))
+function buildColumnKeyMap(table: Table): Map<Column, string> {
+  const map = new Map<Column, string>()
+  for (const [key, col] of Object.entries(getTableColumns(table))) {
+    map.set(col as Column, key)
   }
+  return map
+}
 
-  return query.limit(limit)
+export function encodeCursor(
+  row: Record<string, unknown>,
+  columns: ColumnConfig[],
+  table: Table,
+): string {
+  const keyMap = buildColumnKeyMap(table)
+  return columns
+    .map(({column, encoder}) => {
+      const name = keyMap.get(column as Column) ?? (column as Column).name
+      const value = row[name]
+      return (encoder ?? DEFAULT_ENCODER)(value)
+    })
+    .join('::')
+}
+
+export function decodeCursor(cursor: string): string[] {
+  return cursor.split('::')
 }
 
 export interface CursorFilters<T> {

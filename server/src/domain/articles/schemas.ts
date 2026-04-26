@@ -1,6 +1,7 @@
 import z from 'zod'
 
 import {ISODateTime} from '../../lib/util/zod.ts'
+import {Feed} from '../feeds/schemas.ts'
 
 export const Article = z
   .object({
@@ -13,6 +14,7 @@ export const Article = z
     imageUrl: z.string().nullable(),
     createdAt: ISODateTime,
     updatedAt: ISODateTime.nullable(),
+    feed: Feed.pick({id: true, title: true, url: true, iconUrl: true}).nullable(),
   })
   .meta({
     id: 'Article',

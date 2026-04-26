@@ -9,6 +9,7 @@ import {createArticle, findArticleByUrl, updateArticle} from '../domain/articles
 import {log} from '../lib/logger.ts'
 import {storage} from '../lib/storage.ts'
 import {fetchPage} from '../lib/util/fetch-page.ts'
+import {htmlToMarkdown} from '../lib/util/html-to-markdown.ts'
 import {ow} from '../lib/workflows.ts'
 
 const job = defineWorkflow(
@@ -44,7 +45,7 @@ const job = defineWorkflow(
           feedId: input.feedId,
           url: input.article.link,
           title: input.article.title,
-          description: input.article.description,
+          description: htmlToMarkdown(input.article.description),
           author: input.article.author ?? null,
           updatedAt,
         })
@@ -55,7 +56,7 @@ const job = defineWorkflow(
       await updateArticle(storedArticle.id, {
         feedId: input.feedId,
         title: input.article.title,
-        description: input.article.description,
+        description: htmlToMarkdown(input.article.description),
         author: input.article.author ?? null,
         updatedAt,
       })
@@ -68,8 +69,9 @@ const job = defineWorkflow(
     const content = await step.run({name: 'fetch-content'}, async () => {
       try {
         const html = await fetchPage(input.article.link)
+
         const {document} = parseHTML(html)
-        const result = await Defuddle(document, undefined, {
+        const result = await Defuddle(document, input.article.link, {
           markdown: true,
         })
 
@@ -79,7 +81,7 @@ const job = defineWorkflow(
           imageUrl: result.image,
         }
       } catch (error) {
-        log.warn({error, url: input.article.link}, 'could not fetch article content')
+        log.error({error, url: input.article.link}, 'could not fetch article content')
         return {content: null, wordsCount: null, imageUrl: null}
       }
     })

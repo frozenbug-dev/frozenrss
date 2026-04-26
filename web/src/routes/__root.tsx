@@ -1,5 +1,6 @@
 import {TanStackDevtools} from '@tanstack/react-devtools'
 import {formDevtoolsPlugin} from '@tanstack/react-form-devtools'
+import {hotkeysDevtoolsPlugin} from '@tanstack/react-hotkeys-devtools'
 import type {QueryClient} from '@tanstack/react-query'
 import {HeadContent, Link, Scripts, createRootRouteWithContext} from '@tanstack/react-router'
 import {TanStackRouterDevtoolsPanel} from '@tanstack/react-router-devtools'
@@ -79,6 +80,7 @@ function RootDocument({children}: {children: React.ReactNode}) {
             },
             TanStackQueryDevtools,
             formDevtoolsPlugin(),
+            hotkeysDevtoolsPlugin(),
           ]}
         />
         <Scripts />

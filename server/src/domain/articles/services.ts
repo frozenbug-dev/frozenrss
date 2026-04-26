@@ -1,11 +1,28 @@
-import {and, count, eq} from 'drizzle-orm'
+import {count, eq, and, getTableColumns} from 'drizzle-orm'
 
 import {db} from '../../db/client.ts'
-import {article, type ArticleInsertRow} from '../../db/schema.ts'
-import {withCursor, type CursorFilters} from '../../lib/util/db.ts'
+import {article, feed, type ArticleInsertRow} from '../../db/schema.ts'
+import {withCursor, type CursorFilters, type ColumnConfig} from '../../lib/util/db.ts'
+
+export const ARTICLE_SORT_COLUMNS: Record<'id' | 'updatedAt', ColumnConfig[]> = {
+  id: [{column: article.id}],
+  updatedAt: [{column: article.updatedAt, default: new Date(0)}, {column: article.id}],
+}
 
 export async function findArticleById(id: string) {
-  const [row] = await db.select().from(article).where(eq(article.id, id))
+  const [row] = await db
+    .select({
+      ...getTableColumns(article),
+      feed: {
+        id: feed.id,
+        title: feed.title,
+        url: feed.url,
+        iconUrl: feed.iconUrl,
+      },
+    })
+    .from(article)
+    .leftJoin(feed, eq(article.feedId, feed.id))
+    .where(eq(article.id, id))
 
   return row
 }
@@ -19,7 +36,10 @@ export async function findArticleByUrl(url: string, feedId: string) {
   return row
 }
 
-export async function listArticles(filters: CursorFilters<string> = {}) {
+export async function listArticles(filters: CursorFilters<string> & {sort?: 'id' | 'updatedAt'} = {}) {
+  const sort = filters.sort ?? 'updatedAt'
+  const columns = ARTICLE_SORT_COLUMNS[sort]
+
   const query = db
     .select({
       id: article.id,
@@ -31,12 +51,19 @@ export async function listArticles(filters: CursorFilters<string> = {}) {
       imageUrl: article.imageUrl,
       createdAt: article.createdAt,
       updatedAt: article.updatedAt,
+      feed: {
+        id: feed.id,
+        title: feed.title,
+        url: feed.url,
+        iconUrl: feed.iconUrl,
+      },
     })
     .from(article)
+    .leftJoin(feed, eq(article.feedId, feed.id))
     .$dynamic()
 
   return withCursor(query, {
-    column: article.id,
+    columns: columns as [ColumnConfig, ...ColumnConfig[]],
     cursor: filters.cursor,
     dir: filters.dir ?? 'desc',
     limit: filters.limit ?? 50,
@@ -50,10 +77,7 @@ export async function createArticle(input: ArticleInsertRow) {
 }
 
 export async function updateArticle(id: string, input: Partial<ArticleInsertRow>) {
-  await db
-    .update(article)
-    .set(input)
-    .where(eq(article.id, id))
+  await db.update(article).set(input).where(eq(article.id, id))
 }
 
 export async function countArticles() {
