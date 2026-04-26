@@ -14,10 +14,19 @@ interface TextareaProps {
   className?: string
 }
 
-export function Textarea({required, hideLabel, label, helpText, disabled, placeholder, rows = 3, className}: TextareaProps) {
+export function Textarea({
+  required,
+  hideLabel,
+  label,
+  helpText,
+  disabled,
+  placeholder,
+  rows = 3,
+  className,
+}: TextareaProps) {
   const field = useFieldContext<string>()
   const form = useFormContext()
-  const hasErrors = form.state.isSubmitted && field.state.meta.errors.length > 0
+  const hasErrors = form.state.submissionAttempts > 0 && field.state.meta.errors.length > 0
 
   return (
     <Field className={className} data-invalid={hasErrors}>
@@ -32,7 +41,7 @@ export function Textarea({required, hideLabel, label, helpText, disabled, placeh
         onBlur={() => field.handleBlur()}
         placeholder={placeholder}
         disabled={disabled}
-        aria-invalid={field.state.meta.errors.length > 0}
+        aria-invalid={hasErrors}
         required={required}
         rows={rows}
       />

@@ -14,7 +14,7 @@ interface SwitchProps {
 export function Switch({label, required, disabled, helpText, className}: SwitchProps) {
   const field = useFieldContext<boolean>()
   const form = useFormContext()
-  const hasErrors = form.state.isSubmitted && field.state.meta.errors.length > 0
+  const hasErrors = form.state.submissionAttempts > 0 && field.state.meta.errors.length > 0
 
   return (
     <Field className={className} data-invalid={hasErrors}>
@@ -26,7 +26,7 @@ export function Switch({label, required, disabled, helpText, className}: SwitchP
           onCheckedChange={checked => field.handleChange(checked === true)}
           onBlur={() => field.handleBlur()}
           disabled={disabled}
-          aria-invalid={field.state.meta.errors.length > 0}
+          aria-invalid={hasErrors}
           required={required}
         />
         <div className="flex flex-col gap-1">

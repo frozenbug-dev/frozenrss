@@ -20,11 +20,11 @@ interface NumberInputProps {
 
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(function NumberInput(
   {required, hideLabel, label, helpText, disabled, placeholder, min, max, step, className},
-  ref,
+  ref
 ) {
   const field = useFieldContext<number | ''>()
   const form = useFormContext()
-  const hasErrors = form.state.isSubmitted && field.state.meta.errors.length > 0
+  const hasErrors = form.state.submissionAttempts > 0 && field.state.meta.errors.length > 0
 
   return (
     <Field className={className} data-invalid={hasErrors}>
@@ -44,7 +44,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(functi
         onBlur={() => field.handleBlur()}
         placeholder={placeholder}
         disabled={disabled}
-        aria-invalid={field.state.meta.errors.length > 0}
+        aria-invalid={hasErrors}
         required={required}
         min={min}
         max={max}

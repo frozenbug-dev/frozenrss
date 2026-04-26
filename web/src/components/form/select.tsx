@@ -1,11 +1,5 @@
-import {
-  Select as SelectPrimitive,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '#/components/ui/select'
 import {Field, FieldDescription, FieldError, FieldLabel} from '#/components/ui/field'
+import {Select as SelectPrimitive, SelectContent, SelectItem, SelectTrigger, SelectValue} from '#/components/ui/select'
 
 import {useFieldContext, useFormContext} from './index'
 
@@ -28,7 +22,7 @@ interface SelectProps {
 export function Select({label, items, placeholder, required, hideLabel, disabled, helpText, className}: SelectProps) {
   const field = useFieldContext<string>()
   const form = useFormContext()
-  const hasErrors = form.state.isSubmitted && field.state.meta.errors.length > 0
+  const hasErrors = form.state.submissionAttempts > 0 && field.state.meta.errors.length > 0
 
   return (
     <Field className={className} data-invalid={hasErrors}>
@@ -42,7 +36,7 @@ export function Select({label, items, placeholder, required, hideLabel, disabled
         disabled={disabled}
         required={required}
       >
-        <SelectTrigger aria-invalid={field.state.meta.errors.length > 0}>
+        <SelectTrigger aria-invalid={hasErrors}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>

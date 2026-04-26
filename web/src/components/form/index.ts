@@ -1,4 +1,4 @@
-import {createFormHook, createFormHookContexts} from '@tanstack/react-form'
+import {createFormHook, createFormHookContexts, FormApi} from '@tanstack/react-form'
 import {useRef} from 'react'
 
 import {CheckBox} from './checkbox'
@@ -31,11 +31,11 @@ const {useAppForm, withForm, withFieldGroup} = createFormHook({
   formContext,
 })
 
-export {useFieldContext, useFormContext, useAppForm, withForm, withFieldGroup}
+export {useAppForm, useFieldContext, useFormContext, withFieldGroup, withForm}
 
 export type UseAppFormReturn = ReturnType<typeof useAppForm>
 
-export function useErrorFocus() {
+export function useFormErrors() {
   const formElement = useRef<HTMLFormElement | null>(null)
 
   return {
@@ -44,5 +44,15 @@ export function useErrorFocus() {
       // @ts-expect-error
       formElement.current?.querySelector('[aria-invalid=true]')?.focus()
     },
+    forwardErrorToForm:
+      <A = any, B = any, C = any, D = any, E = any, F = any, G = any, H = any, I = any, J = any, K = any>(
+        // @ts-expect-error
+        formApi: FormApi<A, B, C, D, E, F, G, H, I, J, K, any>
+      ) =>
+      (error: unknown) => {
+        formApi.setErrorMap({
+          onSubmit: {form: error, fields: {}},
+        })
+      },
   }
 }

@@ -2,7 +2,8 @@ import {useMutation} from '@tanstack/react-query'
 import {Link, createFileRoute, useNavigate, useSearch} from '@tanstack/react-router'
 import {z} from 'zod'
 
-import {useAppForm, useErrorFocus} from '#/components/form'
+import {useAppForm, useFormErrors} from '#/components/form'
+import {CardContent, CardFooter, CardHeader} from '#/components/ui/card'
 import {authClient} from '#/lib/auth-client'
 import {type SignupValues, signupSchema} from '#/lib/auth-schemas'
 
@@ -26,9 +27,7 @@ function SignupPage() {
         email: values.email,
         password: values.password,
       })
-      if (error) {
-        throw new Error(error.message ?? 'Sign up failed')
-      }
+      if (error) throw error
       return data
     },
     onSuccess: () => {
@@ -36,7 +35,7 @@ function SignupPage() {
     },
   })
 
-  const {formElement, focusErroredField} = useErrorFocus()
+  const {formElement, focusErroredField, forwardErrorToForm} = useFormErrors()
   const form = useAppForm({
     defaultValues: {
       name: '',
@@ -45,47 +44,61 @@ function SignupPage() {
       confirmPassword: '',
     } satisfies SignupValues,
     validators: {
-      onChange: signupSchema,
+      onSubmit: signupSchema,
     },
-    onSubmit: async ({value}) => {
-      await signupMutation.mutateAsync(value)
+    onSubmit: async ({value, formApi}) => {
+      await signupMutation.mutateAsync(value, {
+        onError: forwardErrorToForm(formApi),
+      })
     },
     onSubmitInvalid: focusErroredField,
   })
 
   return (
     <>
-      <h2 className="text-xl font-semibold text-foreground">Create account</h2>
+      <CardHeader>
+        <h2 className="text-xl font-semibold text-foreground">Create account</h2>
+      </CardHeader>
 
-      <form
-        ref={formElement}
-        onSubmit={e => {
-          e.preventDefault()
-          form.handleSubmit()
-        }}
-        className="flex flex-col gap-3"
-        noValidate
-      >
-        <form.AppForm>
-          <form.AppField name="name">{field => <field.TextField label="Name" required />}</form.AppField>
-          <form.AppField name="email">{field => <field.TextField label="Email" type="email" required />}</form.AppField>
-          <form.AppField name="password">{field => <field.PasswordField label="Password" required />}</form.AppField>
-          <form.AppField name="confirmPassword">
-            {field => <field.PasswordField label="Confirm password" required />}
-          </form.AppField>
+      <CardContent>
+        <form
+          ref={formElement}
+          onSubmit={e => {
+            e.preventDefault()
+            form.handleSubmit()
+          }}
+          className="flex flex-col gap-3"
+          noValidate
+        >
+          <form.AppForm>
+            <form.AppField name="name">{field => <field.TextField label="Name" required />}</form.AppField>
+            <form.AppField name="email">
+              {field => <field.TextField label="Email" type="email" required />}
+            </form.AppField>
+            <form.AppField name="password">{field => <field.PasswordField label="Password" required />}</form.AppField>
+            <form.AppField name="confirmPassword">
+              {field => <field.PasswordField label="Confirm password" required />}
+            </form.AppField>
 
-          <form.FormError />
+            <form.FormError />
 
-          <form.SubmitButton className="mt-2 w-full">Create account</form.SubmitButton>
-        </form.AppForm>
-      </form>
+            <form.SubmitButton className="mt-2 w-full">Create account</form.SubmitButton>
+          </form.AppForm>
+        </form>
+      </CardContent>
 
-      <p className="text-center text-sm text-default-500">
-        Already have an account?{' '}
-        <Link to="/auth" search={{redirect: search.redirect}} className="font-medium text-accent hover:underline">
-          Sign in
-        </Link>
-      </p>
+      <CardFooter className="justify-center">
+        <p className="text-center text-sm text-default-500 flex gap-x-2 justify-center">
+          <span>Already have an account?</span>
+          <Link
+            to="/auth"
+            search={{redirect: search.redirect}}
+            className="font-medium text-primary-foreground underline"
+          >
+            Sign in
+          </Link>
+        </p>
+      </CardFooter>
     </>
   )
 }

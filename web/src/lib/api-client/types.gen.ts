@@ -8,6 +8,11 @@ export type ClientOptions = {
 export type Feed = {
   id: string
   url: string
+  title: string | null
+  description: string | null
+  iconUrl: string | null
+  language: string | null
+  error: string | null
   lastPullAt: string | null
   createdAt: string
 }

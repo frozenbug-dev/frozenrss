@@ -1,8 +1,10 @@
 import {TanStackDevtools} from '@tanstack/react-devtools'
+import {formDevtoolsPlugin} from '@tanstack/react-form-devtools'
 import type {QueryClient} from '@tanstack/react-query'
 import {HeadContent, Link, Scripts, createRootRouteWithContext} from '@tanstack/react-router'
 import {TanStackRouterDevtoolsPanel} from '@tanstack/react-router-devtools'
 
+import {CreateFeedDialog} from '#/components/dialogs/create-feed-dialog'
 import {Button} from '#/components/ui/button'
 import {TooltipProvider} from '#/components/ui/tooltip'
 import {getLocale} from '#/paraglide/runtime'
@@ -13,8 +15,6 @@ import appCss from '../assets/styles.css?url'
 
 interface MyRouterContext {
   queryClient: QueryClient
-  request?: Request
-  user?: {id: string; email: string; name: string; role: string}
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -48,18 +48,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   shellComponent: RootDocument,
 })
 
-function NotFound() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-4">
-      <h1 className="text-6xl font-bold text-foreground">404</h1>
-      <p className="text-lg text-default-500">This page could not be found.</p>
-      <Link to="/">
-        <Button variant="default">Go home</Button>
-      </Link>
-    </div>
-  )
-}
-
 function RootDocument({children}: {children: React.ReactNode}) {
   return (
     <html lang={getLocale()} className="dark">
@@ -75,7 +63,11 @@ function RootDocument({children}: {children: React.ReactNode}) {
       </head>
 
       <body className="bg-background">
-        <TooltipProvider>{children}</TooltipProvider>
+        <TooltipProvider>
+          <CreateFeedDialog.Viewport />
+          {children}
+        </TooltipProvider>
+
         <TanStackDevtools
           config={{
             position: 'bottom-right',
@@ -86,10 +78,23 @@ function RootDocument({children}: {children: React.ReactNode}) {
               render: <TanStackRouterDevtoolsPanel />,
             },
             TanStackQueryDevtools,
+            formDevtoolsPlugin(),
           ]}
         />
         <Scripts />
       </body>
     </html>
+  )
+}
+
+function NotFound() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-4">
+      <h1 className="text-6xl font-bold text-foreground">404</h1>
+      <p className="text-lg text-default-500">This page could not be found.</p>
+      <Link to="/">
+        <Button variant="default">Go home</Button>
+      </Link>
+    </div>
   )
 }

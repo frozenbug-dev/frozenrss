@@ -22,7 +22,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
 ) {
   const field = useFieldContext<string>()
   const form = useFormContext()
-  const hasErrors = form.state.isSubmitted && field.state.meta.errors.length > 0
+  const hasErrors = form.state.submissionAttempts > 0 && field.state.meta.errors.length > 0
 
   return (
     <Field className={className} data-invalid={hasErrors}>
@@ -39,7 +39,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
         onBlur={() => field.handleBlur()}
         placeholder={placeholder}
         disabled={disabled}
-        aria-invalid={field.state.meta.errors.length > 0}
+        aria-invalid={hasErrors}
         required={required}
       />
       {helpText && <FieldDescription>{helpText}</FieldDescription>}

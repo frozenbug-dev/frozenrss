@@ -2,7 +2,8 @@ import {useMutation} from '@tanstack/react-query'
 import {Link, createFileRoute, useNavigate, useSearch} from '@tanstack/react-router'
 import {z} from 'zod'
 
-import {useAppForm, useErrorFocus} from '#/components/form'
+import {useAppForm, useFormErrors} from '#/components/form'
+import {CardContent, CardFooter, CardHeader} from '#/components/ui/card'
 import {authClient} from '#/lib/auth-client'
 import {type LoginValues, loginSchema} from '#/lib/auth-schemas'
 
@@ -25,9 +26,7 @@ function LoginPage() {
         email: values.email,
         password: values.password,
       })
-      if (error) {
-        throw new Error(error.message ?? 'Invalid email or password')
-      }
+      if (error) throw error
       return data
     },
     onSuccess: () => {
@@ -35,7 +34,7 @@ function LoginPage() {
     },
   })
 
-  const {formElement, focusErroredField} = useErrorFocus()
+  const {formElement, focusErroredField, forwardErrorToForm} = useFormErrors()
   const form = useAppForm({
     defaultValues: {
       email: '',
@@ -44,45 +43,55 @@ function LoginPage() {
     validators: {
       onChange: loginSchema,
     },
-    onSubmit: async ({value}) => {
-      await loginMutation.mutateAsync(value)
+    onSubmit: async ({value, formApi}) => {
+      await loginMutation.mutateAsync(value, {
+        onError: forwardErrorToForm(formApi),
+      })
     },
     onSubmitInvalid: focusErroredField,
   })
 
   return (
     <>
-      <h2 className="text-xl font-semibold text-foreground mb-4">Sign in</h2>
+      <CardHeader>
+        <h2 className="text-xl font-semibold text-foreground">Sign in</h2>
+      </CardHeader>
 
-      <form
-        ref={formElement}
-        onSubmit={e => {
-          e.preventDefault()
-          form.handleSubmit()
-        }}
-        noValidate
-        className="flex flex-col gap-3 mb-4"
-      >
-        <form.AppForm>
-          <form.AppField name="email">{field => <field.TextField label="Email" type="email" required />}</form.AppField>
-          <form.AppField name="password">{field => <field.PasswordField label="Password" required />}</form.AppField>
-
-          <form.FormError />
-
-          <form.SubmitButton className="mt-2 w-full">Sign in</form.SubmitButton>
-        </form.AppForm>
-      </form>
-
-      <p className="text-center text-sm text-default-500">
-        Don't have an account?{' '}
-        <Link
-          to="/auth/signup"
-          search={{redirect: search.redirect}}
-          className="font-medium text-accent hover:underline"
+      <CardContent>
+        <form
+          ref={formElement}
+          onSubmit={e => {
+            e.preventDefault()
+            form.handleSubmit()
+          }}
+          noValidate
+          className="flex flex-col gap-3"
         >
-          Sign up
-        </Link>
-      </p>
+          <form.AppForm>
+            <form.AppField name="email">
+              {field => <field.TextField label="Email" type="email" required />}
+            </form.AppField>
+            <form.AppField name="password">{field => <field.PasswordField label="Password" required />}</form.AppField>
+
+            <form.FormError />
+
+            <form.SubmitButton className="mt-2 w-full">Sign in</form.SubmitButton>
+          </form.AppForm>
+        </form>
+      </CardContent>
+
+      <CardFooter className="justify-center">
+        <p className="text-center text-sm text-default-500 flex gap-x-2 justify-center">
+          <span>Don't have an account?</span>
+          <Link
+            to="/auth/signup"
+            search={{redirect: search.redirect}}
+            className="font-medium text-primary-foreground underline"
+          >
+            Sign up
+          </Link>
+        </p>
+      </CardFooter>
     </>
   )
 }

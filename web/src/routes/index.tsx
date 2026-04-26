@@ -1,5 +1,7 @@
-import {createFileRoute} from '@tanstack/react-router'
+import {createFileRoute, Outlet} from '@tanstack/react-router'
 
+import {AppSidebar} from '#/components/layout/sidebar'
+import {SidebarProvider, SidebarInset} from '#/components/ui/sidebar'
 import {requireAuth} from '#/lib/auth-guard'
 
 export const Route = createFileRoute('/')({
@@ -9,11 +11,18 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold">Welcome to TanStack Start</h1>
-      <p className="mt-4 text-lg">
-        Edit <code>src/routes/index.tsx</code> to get started.
-      </p>
-    </div>
+    <SidebarProvider
+      style={
+        {
+          '--sidebar-width': 'calc(var(--spacing) * 72)',
+          '--header-height': 'calc(var(--spacing) * 12)',
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <Outlet />
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

@@ -9,7 +9,10 @@ export function FormError() {
     <form.Subscribe selector={state => state.errorMap.onSubmit}>
       {error => {
         if (!error) return null
-        const message = error instanceof Error ? error.message : error
+        let message = error instanceof Error ? error.message : undefined
+        if (!message && typeof error === 'object') message = error.message
+        else if (!message && typeof error === 'string') message = error
+        else message = 'Could not submit the data.'
 
         return (
           <Alert variant="destructive">

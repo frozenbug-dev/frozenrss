@@ -1,4 +1,5 @@
 import {Eye, EyeOff} from 'lucide-react'
+import {AnimatePresence, motion} from 'motion/react'
 import {forwardRef, useState} from 'react'
 
 import {Field, FieldDescription, FieldError, FieldLabel} from '#/components/ui/field'
@@ -18,12 +19,12 @@ interface PasswordFieldProps {
 
 export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(function PasswordField(
   {required, hideLabel, label, helpText, disabled, placeholder, className},
-  ref,
+  ref
 ) {
   const field = useFieldContext<string>()
   const form = useFormContext()
   const [isVisible, setIsVisible] = useState(false)
-  const hasErrors = form.state.isSubmitted && field.state.meta.errors.length > 0
+  const hasErrors = form.state.submissionAttempts > 0 && field.state.meta.errors.length > 0
 
   return (
     <Field className={className} data-invalid={hasErrors}>
@@ -32,18 +33,18 @@ export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(fu
         {required && <span className="text-destructive"> *</span>}
       </FieldLabel>
       <InputGroup>
-      <InputGroupInput
-        ref={ref}
-        type={isVisible ? 'text' : 'password'}
-        name={field.name}
-        value={field.state.value}
-        onChange={e => field.handleChange(e.target.value)}
-        onBlur={() => field.handleBlur()}
-        placeholder={placeholder}
-        disabled={disabled}
-        aria-invalid={field.state.meta.errors.length > 0}
-        required={required}
-      />
+        <InputGroupInput
+          ref={ref}
+          type={isVisible ? 'text' : 'password'}
+          name={field.name}
+          value={field.state.value}
+          onChange={e => field.handleChange(e.target.value)}
+          onBlur={() => field.handleBlur()}
+          placeholder={placeholder}
+          disabled={disabled}
+          aria-invalid={hasErrors}
+          required={required}
+        />
         <InputGroupAddon align="inline-end">
           <InputGroupButton
             type="button"
@@ -51,7 +52,31 @@ export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(fu
             aria-label={isVisible ? 'Hide password' : 'Show password'}
             onClick={() => setIsVisible(!isVisible)}
           >
-            {isVisible ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+            <AnimatePresence mode="popLayout" initial={false}>
+              {isVisible ? (
+                <motion.span
+                  key="eye"
+                  className="inline-flex"
+                  initial={{scale: 0.8, opacity: 0, filter: 'blur(4px)'}}
+                  animate={{scale: 1, opacity: 1, filter: 'blur(0px)'}}
+                  exit={{scale: 0.8, opacity: 0, filter: 'blur(4px)'}}
+                  transition={{duration: 0.4, ease: [0.23, 1, 0.32, 1]}}
+                >
+                  <Eye className="size-4" />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="eyeOff"
+                  className="inline-flex"
+                  initial={{scale: 0.8, opacity: 0, filter: 'blur(4px)'}}
+                  animate={{scale: 1, opacity: 1, filter: 'blur(0px)'}}
+                  exit={{scale: 0.8, opacity: 0, filter: 'blur(4px)'}}
+                  transition={{duration: 0.4, ease: [0.23, 1, 0.32, 1]}}
+                >
+                  <EyeOff className="size-4" />
+                </motion.span>
+              )}
+            </AnimatePresence>
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>
