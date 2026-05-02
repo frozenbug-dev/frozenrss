@@ -1,6 +1,6 @@
 'use client'
 
-import {IconCreditCard, IconDotsVertical, IconLogout, IconNotification, IconUserCircle} from '@tabler/icons-react'
+import {IconDotsVertical, IconLogout, IconUserCircle} from '@tabler/icons-react'
 import {useMutation} from '@tanstack/react-query'
 
 import {authClient} from '#/lib/auth-client'
@@ -57,6 +57,7 @@ export function NavUser({
               </div>
               <IconDotsVertical className="ml-auto size-4" />
             </DropdownMenuTrigger>
+
             <DropdownMenuContent
               className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
               side={isMobile ? 'bottom' : 'right'}

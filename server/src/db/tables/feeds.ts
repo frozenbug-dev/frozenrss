@@ -51,6 +51,7 @@ export const article = pgTable('article', {
   imageUrl: text('image_url'),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  publishedAt: timestamp('published_at').notNull(),
   updatedAt: timestamp('updated_at'),
 })
 

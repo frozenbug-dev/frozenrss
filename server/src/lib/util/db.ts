@@ -8,6 +8,10 @@ export function withCursor<TSelect extends PgSelect>(qb: TSelect, options: WithC
 
   let query = qb.orderBy(...columns.map(({column}) => orderFn(column as Column)))
 
+  if (limit > 0) {
+    query = query.limit(limit)
+  }
+
   if (options.cursor != null) {
     const values = decodeCursor(options.cursor)
     const cond = dir === 'asc' ? gt : lt
@@ -32,7 +36,7 @@ export function withCursor<TSelect extends PgSelect>(qb: TSelect, options: WithC
     }
   }
 
-  return query.limit(limit)
+  return query
 }
 
 const DEFAULT_ENCODER = (value: unknown): string =>
@@ -70,9 +74,10 @@ export function encodeCursor(
 ): string {
   const keyMap = buildColumnKeyMap(table)
   return columns
-    .map(({column, encoder}) => {
+    .map(({column, encoder, default: def}) => {
       const name = keyMap.get(column as Column) ?? (column as Column).name
-      const value = row[name]
+      const rawValue = row[name]
+      const value = rawValue == null && def != null ? def : rawValue
       return (encoder ?? DEFAULT_ENCODER)(value)
     })
     .join('::')

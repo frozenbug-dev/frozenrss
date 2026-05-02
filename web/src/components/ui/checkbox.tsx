@@ -1,16 +1,27 @@
-"use client"
+'use client'
 
-import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox"
+import {Checkbox as CheckboxPrimitive} from '@base-ui/react/checkbox'
+import {IconCheck} from '@tabler/icons-react'
 
-import { cn } from "#/lib/utils"
-import { IconCheck } from "@tabler/icons-react"
+import {cn} from '#/lib/utils'
 
-function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
+function Checkbox({className, ...props}: CheckboxPrimitive.Root.Props) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        "peer relative flex size-4.5 shrink-0 items-center justify-center rounded-none border border-input bg-transparent transition-shadow outline-none group-has-disabled/field:opacity-50 after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 aria-invalid:aria-checked:border-primary dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground dark:data-checked:bg-primary",
+        'peer relative flex shrink-0 items-center justify-center',
+        'size-4.5 rounded-md',
+        'border border-input',
+        'bg-transparent',
+        'transition-shadow outline-none',
+        'group-has-disabled/field:opacity-50',
+        'after:absolute after:-inset-x-3 after:-inset-y-2',
+        'focus-visible:ring-2 focus-visible:ring-ring/30',
+        'disabled:cursor-not-allowed disabled:opacity-50',
+        'aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40',
+        'data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground',
+        'dark:data-checked:bg-primary active:scale-[0.97] active:duration-100',
         className
       )}
       {...props}
@@ -19,11 +30,10 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
         data-slot="checkbox-indicator"
         className="grid place-content-center text-current transition-none [&>svg]:size-3.5"
       >
-        <IconCheck
-        />
+        <IconCheck />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )
 }
 
-export { Checkbox }
+export {Checkbox}

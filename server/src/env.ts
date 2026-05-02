@@ -44,8 +44,10 @@ export const ENV = defineEnvironment($ => ({
   },
 
   WORKERS: {
-    CONCURRENCY: $('WORKERS_CONCURRENCY', z.coerce.number().default(5)),
+    CONCURRENCY: $('WORKERS_CONCURRENCY', z.coerce.number().default(20)),
   },
 
   PLAYWRIGHT_WS_URL: $('PLAYWRIGHT_WS_URL', z.url().default('ws://playwright:3000')),
+
+  CRON_PULL_FEEDS: $('CRON_PULL_FEEDS', z.string().default('*/5 * * * *')),
 }))

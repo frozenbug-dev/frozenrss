@@ -6,6 +6,7 @@ import type {Client, Pool} from 'pg'
 import {app} from './app.ts'
 import {db} from './db/client.ts'
 import {ENV} from './env.ts'
+import {startCronJobs} from './server.cron.ts'
 
 const server = serve(
   {
@@ -18,11 +19,15 @@ const server = serve(
   }
 )
 
+const pullFeedJob = startCronJobs()
+
 process.on('SIGINT', () => shutdown('SIGINT'))
 process.on('SIGTERM', () => shutdown('SIGTERM'))
 
 async function shutdown(signal: string) {
   console.log(`received ${signal}, shutting down...`)
+
+  pullFeedJob.stop()
 
   server.close(async error => {
     if (error) {

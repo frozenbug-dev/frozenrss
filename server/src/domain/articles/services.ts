@@ -4,9 +4,9 @@ import {db} from '../../db/client.ts'
 import {article, feed, type ArticleInsertRow} from '../../db/schema.ts'
 import {withCursor, type CursorFilters, type ColumnConfig} from '../../lib/util/db.ts'
 
-export const ARTICLE_SORT_COLUMNS: Record<'id' | 'updatedAt', ColumnConfig[]> = {
+export const ARTICLE_SORT_COLUMNS: Record<'id' | 'createdAt', ColumnConfig[]> = {
   id: [{column: article.id}],
-  updatedAt: [{column: article.updatedAt, default: new Date(0)}, {column: article.id}],
+  createdAt: [{column: article.createdAt}, {column: article.id}],
 }
 
 export async function findArticleById(id: string) {
@@ -36,8 +36,8 @@ export async function findArticleByUrl(url: string, feedId: string) {
   return row
 }
 
-export async function listArticles(filters: CursorFilters<string> & {sort?: 'id' | 'updatedAt'} = {}) {
-  const sort = filters.sort ?? 'updatedAt'
+export async function listArticles(filters: CursorFilters<string> & {sort?: 'id' | 'createdAt'} = {}) {
+  const sort = filters.sort ?? 'createdAt'
   const columns = ARTICLE_SORT_COLUMNS[sort]
 
   const query = db

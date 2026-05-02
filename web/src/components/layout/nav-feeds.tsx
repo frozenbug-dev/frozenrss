@@ -1,36 +1,10 @@
-import {IconDots, IconFolder, IconShare3, IconTrash, type Icon} from '@tabler/icons-react'
 import {useQuery} from '@tanstack/react-query'
 import {Link} from '@tanstack/react-router'
 
 import {listFeedsOptions} from '#/lib/api'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from '@/components/ui/sidebar'
+import {SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem} from '@/components/ui/sidebar'
 
-export function NavFeeds({
-  items,
-}: {
-  items: {
-    name: string
-    url: string
-    icon: Icon
-  }[]
-}) {
-  const {isMobile} = useSidebar()
-
+export function NavFeeds() {
   const {data: feeds, isLoading} = useQuery({
     ...listFeedsOptions({
       query: {

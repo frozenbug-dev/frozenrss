@@ -30,11 +30,16 @@ const job = defineWorkflow({name: 'pull-feed', schema: z.object({feedId: z.uuidv
     }
   })
 
+  log.info(`processing ${items.length} articles`)
+  let i = 0
+  for (const item of items) {
+    await processArticle(input.feedId, item, i)
+    i++
+  }
+
+  await step.waitForSignal({signal: `${input.feedId}:${items.length - 1}`})
+
   await step.run({name: 'parse-feed'}, async () => {
-    const jobs = await Promise.all(items.map(article => processArticle(input.feedId, article)))
-
-    await Promise.all(jobs.map(job => job.result()))
-
     await updateFeed(input.feedId, {lastPullAt: new Date()})
 
     log.info('finished pulling feed')
@@ -42,9 +47,13 @@ const job = defineWorkflow({name: 'pull-feed', schema: z.object({feedId: z.uuidv
 })
 
 export async function pullFeed(feedId: string) {
-  return ow.runWorkflow(job.spec, {
-    feedId,
-  })
+  return ow.runWorkflow(
+    job.spec,
+    {
+      feedId,
+    },
+    {idempotencyKey: feedId}
+  )
 }
 
 export default () => ow.implementWorkflow(job.spec, job.fn)

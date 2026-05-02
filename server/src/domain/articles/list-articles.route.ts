@@ -26,7 +26,7 @@ const defs = createRoute({
       limit: z.coerce.number().int().nonnegative().default(50),
       cursor: z.string().optional(),
       dir: z.enum(['asc', 'desc']).default('desc'),
-      sort: z.enum(['id', 'updatedAt']).default('updatedAt'),
+      sort: z.enum(['id', 'createdAt']).default('createdAt'),
     }),
   },
   responses: {

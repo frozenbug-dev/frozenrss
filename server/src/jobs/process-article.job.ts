@@ -17,9 +17,11 @@ const job = defineWorkflow(
     name: 'process-article',
     schema: z.object({
       feedId: z.uuidv7(),
+      index: z.coerce.number().optional(),
       article: z.looseObject({
         title: z.string(),
         description: z.string().nullable(),
+        summary: z.string().nullable(),
         author: z.string().nullable().optional(),
         link: z.url(),
         date: z.iso.datetime().nullable().optional(),
@@ -28,6 +30,9 @@ const job = defineWorkflow(
     }),
   },
   async ({input, step}) => {
+    const cleanUrl = new URL(input.article.link)
+    cleanUrl.search = ''
+
     log.info(`processing article: ${input.article.link}`)
 
     const prefix = slugify(input.article.title, {lower: true, trim: true, remove: /[*+~.()&#'"!:@\\]/g})
@@ -35,7 +40,7 @@ const job = defineWorkflow(
       .trim()
 
     const articleId = await step.run({name: 'persist-rss'}, async () => {
-      const storedArticle = await findArticleByUrl(input.article.link, input.feedId)
+      const storedArticle = await findArticleByUrl(cleanUrl.toString(), input.feedId)
 
       const _updatedAt = input.article.date ?? input.article.pubdate ?? null
       const updatedAt = _updatedAt ? new Date(_updatedAt) : null
@@ -43,11 +48,13 @@ const job = defineWorkflow(
       if (!storedArticle) {
         const article = await createArticle({
           feedId: input.feedId,
-          url: input.article.link,
+          url: cleanUrl.toString(),
           title: input.article.title,
-          description: htmlToMarkdown(input.article.description),
+          description: input.article.summary,
+          content: htmlToMarkdown(input.article.description),
           author: input.article.author ?? null,
           updatedAt,
+          publishedAt: updatedAt || new Date(),
         })
 
         return article.id
@@ -81,7 +88,7 @@ const job = defineWorkflow(
           imageUrl: result.image,
         }
       } catch (error) {
-        log.error({error, url: input.article.link}, 'could not fetch article content')
+        log.warn({error, url: input.article.link}, `could not fetch content of article ${input.article.link}`)
         return {content: null, wordsCount: null, imageUrl: null}
       }
     })
@@ -96,19 +103,29 @@ const job = defineWorkflow(
         await storage.setItem(`articles/${prefix}/content.md`, content.content)
       })
     }
+
+    await step.sendSignal({
+      name: 'process-article:done',
+      signal: `${input.feedId}:${input.index}`,
+    })
   }
 )
 
-export async function processArticle(feedId: string, article: FeedParser.Item) {
-  return ow.runWorkflow(job.spec, {
-    feedId,
-    article: {
-      ...article,
-      author: article.author,
-      date: article.date?.toISOString(),
-      pubdate: article.pubdate?.toISOString(),
+export async function processArticle(feedId: string, article: FeedParser.Item, index?: number) {
+  return ow.runWorkflow(
+    job.spec,
+    {
+      feedId,
+      index,
+      article: {
+        ...article,
+        author: article.author,
+        date: article.date?.toISOString?.(),
+        pubdate: article.pubdate?.toISOString?.(),
+      },
     },
-  })
+    {idempotencyKey: article.link}
+  )
 }
 
 export default () => ow.implementWorkflow(job.spec, job.fn)

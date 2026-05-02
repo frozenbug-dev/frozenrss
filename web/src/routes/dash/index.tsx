@@ -86,7 +86,12 @@ function RouteComponent() {
               }}
             >
               {virtualItems.map(virtualRow => (
-                <VirtualArticlePreview row={virtualRow} key={virtualRow.index} articles={articles} />
+                <VirtualArticlePreview
+                  row={virtualRow}
+                  key={virtualRow.index}
+                  articles={articles}
+                  loading={isFetchingNextPage}
+                />
               ))}
             </div>
           </div>
@@ -104,10 +109,12 @@ function VirtualArticlePreview({
   row,
   articles,
   ref,
+  loading = true,
 }: {
   row: VirtualItem
   articles: Article[]
   ref?: Ref<HTMLDivElement>
+  loading?: boolean
 }) {
   const search = useSearch({from: '/dash/'})
   const navigate = useNavigate({from: '/dash/'})
@@ -120,7 +127,7 @@ function VirtualArticlePreview({
   )
 
   const isLoaderRow = row.index >= articles.length
-  if (isLoaderRow) {
+  if (isLoaderRow && loading) {
     return (
       <div
         key={row.key}
@@ -134,6 +141,18 @@ function VirtualArticlePreview({
   }
 
   const article = articles[row.index]
+  if (!article)
+    return (
+      <div
+        key={row.key}
+        data-index={row.index}
+        ref={ref}
+        className="flex items-center justify-center px-4 py-8 text-sm text-muted-foreground"
+      >
+        You reached the end.
+      </div>
+    )
+
   const prevArticle = articles[row.index - 1]
 
   const prevArticleDate = prevArticle?.updatedAt

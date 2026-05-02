@@ -3,7 +3,7 @@
   "ui": "tui",
   "tasks": {
     "build": {
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", ".output/**"]
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]
@@ -11,9 +11,13 @@
     "dev": {
       "persistent": true,
       "cache": false,
-      "with": ["server#dev:jobs"]
+      "with": ["server#dev:jobs", "server#dev:cron"]
     },
     "dev:jobs": {
+      "persistent": true,
+      "cache": false
+    },
+    "dev:cron": {
       "persistent": true,
       "cache": false
     }

@@ -1,12 +1,10 @@
-import {Defuddle} from 'defuddle/node'
-import {parseHTML} from 'linkedom'
 import {defineWorkflow} from 'openworkflow'
 import z from 'zod'
 
 import {findFeedById, updateFeed} from '../domain/feeds/services.ts'
+import {readFeedMeta} from '../domain/feeds/util/read-feed.ts'
 import {log} from '../lib/logger.ts'
 import {storage} from '../lib/storage.ts'
-import {fetchPage} from '../lib/util/fetch-page.ts'
 import {ow} from '../lib/workflows.ts'
 
 const job = defineWorkflow(
@@ -25,26 +23,22 @@ const job = defineWorkflow(
       return row
     })
 
-    const originUrl = new URL(feed.url).origin
-
     const metadata = await step.run({name: 'fetch-metadata'}, async () => {
-      const html = await fetchPage(originUrl)
-      const {document} = parseHTML(html)
-      const result = await Defuddle(document, undefined, {markdown: false})
+      const meta = await readFeedMeta(feed.url)
 
       await storage.setItem(
         `feed-metadata/${new URL(feed.url).hostname.replaceAll('.', '-')}.json`,
-        JSON.stringify(result, null, 2)
+        JSON.stringify(meta, null, 2)
       )
 
-      return result
+      return meta
     })
 
     await step.run({name: 'update-feed'}, async () => {
       await updateFeed(feed.id, {
-        title: metadata.site || undefined,
+        title: metadata.title || undefined,
         description: metadata.description || undefined,
-        iconUrl: metadata.favicon || undefined,
+        iconUrl: metadata.favicon || metadata.image?.url || undefined,
         language: metadata.language || undefined,
       })
     })
@@ -54,7 +48,13 @@ const job = defineWorkflow(
 )
 
 export async function pullFeedMetadata(feedId: string) {
-  return ow.runWorkflow(job.spec, {feedId})
+  return ow.runWorkflow(
+    job.spec,
+    {feedId},
+    {
+      idempotencyKey: feedId,
+    }
+  )
 }
 
 export default () => ow.implementWorkflow(job.spec, job.fn)

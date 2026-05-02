@@ -1,5 +1,6 @@
 import {IconArticle, IconExternalLink} from '@tabler/icons-react'
 import {useQuery} from '@tanstack/react-query'
+import {Link} from '@tanstack/react-router'
 import Markdown, {RuleType} from 'markdown-to-jsx'
 import {memo} from 'react'
 
@@ -74,7 +75,7 @@ export const ArticleContent = memo(({articleId}: ArticleContentProps) => {
           <EmptyDescription>The full content for this article could not be extracted.</EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          <Button variant="outline" to={article.url as `https://${string}`}>
+          <Button variant="outline" render={<Link to={article.url} />}>
             <IconExternalLink data-icon="inline-start" />
             Open article
           </Button>

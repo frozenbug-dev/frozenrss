@@ -30,7 +30,7 @@ export function NavMain({
           <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
               tooltip="Quick Create"
-              render={<Button className="justify-start" />}
+              variant="default"
               onClick={() => CreateFeedDialog.open('create-feed', {})}
             >
               <IconCirclePlusFilled />
@@ -38,6 +38,7 @@ export function NavMain({
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+
         <SidebarMenu>
           {items.map(item => (
             <SidebarMenuItem key={item.title}>

@@ -1,12 +1,15 @@
+import {glob} from 'node:fs/promises'
+import {join} from 'node:path'
+
 import {ENV} from './env.ts'
-import startProcessArticleJob from './jobs/process-article.job.ts'
-import startPullFeedJob from './jobs/pull-feed.job.ts'
-import startPullFeedMetadataJob from './jobs/pull-feed-metadata.job.ts'
 import {ow} from './lib/workflows.ts'
 
-startProcessArticleJob()
-startPullFeedJob()
-startPullFeedMetadataJob()
+// find all job files and load them.
+const jobFiles = glob(join(import.meta.dirname, 'jobs', '*.job.ts'))
+for await (const file of jobFiles) {
+  const {default: startJob} = await import(file)
+  startJob()
+}
 
 const worker = ow.newWorker({
   concurrency: ENV.WORKERS.CONCURRENCY,

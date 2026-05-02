@@ -18,7 +18,7 @@
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0",
     "oxlint-tsgolint": "^0.22.1",
-    "turbo": "^2.9.7"
+    "turbo": "v2.9.8-canary.6"
   },
   "packageManager": "pnpm@11.0.3"
 }

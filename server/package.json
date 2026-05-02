@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "tsx --watch src/server.ts",
     "dev:jobs": "tsx --watch src/server.jobs.ts",
+    "dev:cron": "tsx --watch src/cron.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "db:generate": "NODE_OPTIONS='--import tsx' drizzle-kit generate --config src/db/drizzle.config.ts",
