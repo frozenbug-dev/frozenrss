@@ -53,7 +53,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({children}: {children: React.ReactNode}) {
   return (
-    <html lang={getLocale()} className="dark">
+    <html lang={getLocale()}>
       <head>
         <HeadContent />
 
@@ -63,6 +63,7 @@ function RootDocument({children}: {children: React.ReactNode}) {
           href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
           rel="stylesheet"
         />
+        <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet" />
       </head>
 
       <body className="bg-background">

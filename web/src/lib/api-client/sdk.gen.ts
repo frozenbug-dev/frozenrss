@@ -14,6 +14,8 @@ import type {
   ListArticlesResponses,
   ListFeedsData,
   ListFeedsResponses,
+  UpdateFeedData,
+  UpdateFeedResponses,
 } from './types.gen'
 
 export type Options<
@@ -58,6 +60,19 @@ export const createFeed = <ThrowOnError extends boolean = false>(options: Option
  */
 export const deleteFeed = <ThrowOnError extends boolean = false>(options: Options<DeleteFeedData, ThrowOnError>) =>
   (options.client ?? client).delete<DeleteFeedResponses, unknown, ThrowOnError>({url: '/api/feeds/{id}', ...options})
+
+/**
+ * Update feed
+ */
+export const updateFeed = <ThrowOnError extends boolean = false>(options: Options<UpdateFeedData, ThrowOnError>) =>
+  (options.client ?? client).patch<UpdateFeedResponses, unknown, ThrowOnError>({
+    url: '/api/feeds/{id}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  })
 
 /**
  * List articles

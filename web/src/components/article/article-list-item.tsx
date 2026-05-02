@@ -1,7 +1,7 @@
 import type {ButtonHTMLAttributes, Ref} from 'react'
 
 import type {Article} from '#/lib/api'
-import {formatDate, formatTimeDistance} from '#/lib/date-utils'
+import {formatTimeDistance} from '#/lib/date-utils'
 import {cn} from '#/lib/utils'
 
 import {Skeleton} from '../ui/skeleton'

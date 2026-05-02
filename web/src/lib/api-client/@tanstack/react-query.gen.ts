@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-query'
 
 import {client} from '../client.gen'
-import {createFeed, deleteFeed, getArticle, listArticles, listFeeds, type Options} from '../sdk.gen'
+import {createFeed, deleteFeed, getArticle, listArticles, listFeeds, type Options, updateFeed} from '../sdk.gen'
 import type {
   CreateFeedData,
   CreateFeedResponse,
@@ -22,6 +22,8 @@ import type {
   ListArticlesResponse,
   ListFeedsData,
   ListFeedsResponse,
+  UpdateFeedData,
+  UpdateFeedResponse,
 } from '../types.gen'
 
 export type QueryKey<TOptions extends Options> = [
@@ -181,6 +183,25 @@ export const deleteFeedMutation = (
   const mutationOptions: UseMutationOptions<DeleteFeedResponse, DefaultError, Options<DeleteFeedData>> = {
     mutationFn: async fnOptions => {
       const {data} = await deleteFeed({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      })
+      return data
+    },
+  }
+  return mutationOptions
+}
+
+/**
+ * Update feed
+ */
+export const updateFeedMutation = (
+  options?: Partial<Options<UpdateFeedData>>
+): UseMutationOptions<UpdateFeedResponse, DefaultError, Options<UpdateFeedData>> => {
+  const mutationOptions: UseMutationOptions<UpdateFeedResponse, DefaultError, Options<UpdateFeedData>> = {
+    mutationFn: async fnOptions => {
+      const {data} = await updateFeed({
         ...options,
         ...fnOptions,
         throwOnError: true,

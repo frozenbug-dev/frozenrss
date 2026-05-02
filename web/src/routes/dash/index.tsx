@@ -9,6 +9,7 @@ import * as z from 'zod'
 
 import {ArticleContent} from '#/components/article/article-content'
 import {ArticlePreview, ArticlePreviewSkeleton} from '#/components/article/article-list-item'
+import {ProgressiveBlur} from '#/components/decorations/progressive-blur'
 import {useFocusHelper} from '#/hooks/use-focus-helper'
 import {listArticlesInfiniteOptions, type Article} from '#/lib/api'
 import {formatDate} from '#/lib/date-utils'
@@ -64,8 +65,12 @@ function RouteComponent() {
 
   return (
     <div className="flex h-full">
-      <div ref={parentRef} className="w-full max-w-md overflow-auto border-r no-scrollbar">
-        <header className="h-12 bg-sidebar/50 sticky top-0 z-10 backdrop-blur-lg"></header>
+      <div ref={parentRef} className="w-full max-w-md overflow-auto border-r no-scrollbar relative">
+        {/*<header className="h-12 bg-sidebar/50 sticky top-0 z-10 backdrop-blur-lg"></header>*/}
+        <ProgressiveBlur className="z-10 sticky flex items-center h-16 px-3" backgroundColor="white">
+          Hello
+        </ProgressiveBlur>
+
         {isLoading ? (
           <div className="flex flex-col gap-1 p-3">
             {Array.from({length: 8}).map((_, i) => (

@@ -32,7 +32,7 @@ export type Article = {
     title: string | null
     url: string
     iconUrl: string | null
-  }
+  } | null
 }
 
 export type ArticleWithContent = {
@@ -50,7 +50,7 @@ export type ArticleWithContent = {
     title: string | null
     url: string
     iconUrl: string | null
-  }
+  } | null
   content: string | null
   wordsCount: number | null
 }
@@ -116,6 +116,30 @@ export type DeleteFeedResponses = {
 }
 
 export type DeleteFeedResponse = DeleteFeedResponses[keyof DeleteFeedResponses]
+
+export type UpdateFeedData = {
+  body?: {
+    url?: string
+    title?: string
+    description?: string
+  }
+  path: {
+    id: string
+  }
+  query?: never
+  url: '/api/feeds/{id}'
+}
+
+export type UpdateFeedResponses = {
+  /**
+   * Feed updated.
+   */
+  200: {
+    feed: Feed
+  }
+}
+
+export type UpdateFeedResponse = UpdateFeedResponses[keyof UpdateFeedResponses]
 
 export type ListArticlesData = {
   body?: never

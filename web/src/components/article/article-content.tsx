@@ -1,6 +1,6 @@
 import {IconArticle, IconExternalLink} from '@tabler/icons-react'
 import {useQuery} from '@tanstack/react-query'
-import Markdown from 'markdown-to-jsx'
+import Markdown, {RuleType} from 'markdown-to-jsx'
 import {memo} from 'react'
 
 import {Button} from '#/components/ui/button'
@@ -10,20 +10,6 @@ import {Skeleton} from '#/components/ui/skeleton'
 import {getArticleOptions} from '#/lib/api'
 
 import {YouTubeEmbed} from './youtube-embed'
-
-function getYouTubeVideoId(href: string): string | null {
-  const patterns = [
-    /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
-    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
-    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
-    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
-  ]
-  for (const pattern of patterns) {
-    const match = href.match(pattern)
-    if (match) return match[1]
-  }
-  return null
-}
 
 interface ArticleContentProps {
   articleId: string | undefined
@@ -118,14 +104,18 @@ export const ArticleContent = memo(({articleId}: ArticleContentProps) => {
         <div className="prose prose-neutral dark:prose-invert max-w-none">
           <Markdown
             options={{
-              overrides: {
-                img: {
-                  component: ({src, alt, ...props}) => {
-                    const videoId = getYouTubeVideoId(src ?? '')
-                    if (videoId) return <YouTubeEmbed videoId={videoId} />
-                    return <img src={src} alt={alt} {...props} />
-                  },
-                },
+              renderRule(next, node) {
+                if (node.type === RuleType.htmlBlock && node.tag === 'iframe') {
+                  // oxlint-disable-next-line jsx_a11y/iframe-has-title
+                  return <iframe {...(node.attrs || {})} className="w-full aspect-video" />
+                }
+
+                if (node.type === RuleType.image) {
+                  const youtubeSrc = getYouTubeVideoId(node.target)
+                  if (youtubeSrc) return <YouTubeEmbed videoId={youtubeSrc} />
+                }
+
+                return next()
               },
             }}
           >
@@ -136,3 +126,17 @@ export const ArticleContent = memo(({articleId}: ArticleContentProps) => {
     </ScrollArea>
   )
 })
+
+function getYouTubeVideoId(href: string): string | null {
+  const patterns = [
+    /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+  ]
+  for (const pattern of patterns) {
+    const match = href.match(pattern)
+    if (match) return match[1]
+  }
+  return null
+}
